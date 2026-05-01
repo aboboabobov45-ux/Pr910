@@ -4,7 +4,6 @@ using namespace std;
 #include <fstream>
 #include <string>
 
-//практика 9
 enum Platform {
     pc,
     mobile,
@@ -80,19 +79,6 @@ int flightsimmln(game* gms, int gmssize, game* ssave) {
     return cnt;
 }
 
-//новый массив отсортировать по поддерживаемым платформам
-void sortbubbleplatf(game arr[], int n) {
-    for (int i = 0; i < n - 1; i++) {
-        for (int j = 0; j < n - i - 1; j++) {
-            if (arr[j].platform > arr[j + 1].platform) {
-                game tmp = arr[j];
-                arr[j] = arr[j + 1];
-                arr[j + 1] = tmp;
-            }
-        }
-    }
-}
-
 //вывести все данные по конкретной игре
 void gamename(game* games, int size, const char* srchgame) {
     bool found = false;
@@ -117,17 +103,26 @@ void gamename(game* games, int size, const char* srchgame) {
     }
 }
 
-//сортировка по цене
-void sortbubbleprice(game arr[], int n) {
+//сравнение по платформам
+bool sortplat(game g1, game g2) {
+    return g1.platform > g2.platform;
+}
+//сравнение по цене
+bool sortprice(game g1, game g2) {
+    return g1.price < g2.price;
+}
+//сортировка
+game* sorted(game arr[], int n, bool(*ykaz)(game, game)) {
     for (int i = 0; i < n - 1; i++) {
         for (int j = 0; j < n - i - 1; j++) {
-            if (arr[j].price < arr[j + 1].price) {
+            if (ykaz(arr[j], arr[j + 1])) {
                 game tmp = arr[j];
                 arr[j] = arr[j + 1];
                 arr[j + 1] = tmp;
             }
         }
     }
+    return arr;
 }
 
 //вывести 3 самых дорогих игры
@@ -136,7 +131,7 @@ void top3(game* games, int size) {
     for (int i = 0; i < size; i++) {
         temp[i] = games[i];
     }
-    sortbubbleprice(temp, size);
+    sorted(temp, size, sortprice);
 
     cout << "Три самых дорогих игры: " << endl;
     for (int i = 0; i < 3 && i < size; i++) {
@@ -210,7 +205,7 @@ void chprices(game* games, int size) {
     }
 }
 
-//практика 10, задание 2.1 (сделать чтение своей структуры в бинарный файл.Оформить в виде подпрограмм)
+//практика 10, задание 2.1 (сделать чтение своей структуры в бинарный файл. Оформить в виде подпрограмм)
 void readbingame(game* games, int size, const char* filename) {
     ifstream in(filename, ios::binary | ios::in);
 
@@ -224,7 +219,7 @@ void readbingame(game* games, int size, const char* filename) {
     cout << "Массив из " << size << " игр считан из " << filename << endl;
 }
 
-//практика 10, задание 2.2 (сделать запись своей структуры в бинарный файл.Оформить в виде подпрограмм)
+//практика 10, задание 2.2 (сделать запись своей структуры в бинарный файл. Оформить в виде подпрограмм)
 void writebingame(game* games, int size, const char* filename) {
     ofstream out(filename, ios::binary | ios::out);
 
@@ -247,9 +242,9 @@ void main() {
     int flightcnt = flightsimmln(games, SIZE, flightsim);
     display(flightsim, flightcnt, "Авиасимуляторы с аудиторией от 1 млн: ");
 
-    //новый массив отсортировать по поддерживаемым платформам   
-    sortbubbleplatf(flightsim, flightcnt);
-    display(flightsim, flightcnt, "Авиасимуляторы (отсортировано по платформам): ");
+    //новый массив отсортировать по поддерживаемым платформам
+    sorted(flightsim, flightcnt, sortplat);
+    display(flightsim, flightcnt, "Авиасимуляторы (по платформам): ");
 
     //вывести все данные по конкретной игре
     gamename(games, SIZE, "Skyrim");
